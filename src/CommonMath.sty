@@ -1,0 +1,120 @@
+% Copyright (C) 2022 Anton Rodomanov
+%
+% This file is part of the `CommonMath` package.
+%
+% You may distribute and/or modify this code under the conditions
+% of the LaTeX Project Public License, version 1.3c or any later version.
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{CommonMath}[2022/08/28 Custom math commands]
+
+\RequirePackage{xparse}
+\RequirePackage{letltxmacro}
+\RequirePackage{amsmath}
+\RequirePackage{array}
+\RequirePackage{amssymb}
+\RequirePackage{mathtools}
+
+% Formatting commands.
+\newcommand{\StandardField}[1]{\mathbb{#1}}
+\newcommand{\VectorSpace}[1]{\mathbb{#1}}
+
+% Standard sets.
+\newcommand{\RealField}{\StandardField{R}}
+\newcommand{\ComplexField}{\StandardField{C}}
+\newcommand{\RealFieldPlusInfty}{\StandardField{R} \cup \Set{+\infty}}
+\newcommand{\NonnegativeRay}{\RealField_+}
+\newcommand{\PositiveRay}{\RealField_{++}}
+\newcommand{\RealMatrices}[2]{\RealField^{#1 \times #2}}
+\newcommand{\SymmetricMatricesSymbol}{\mathbb{S}}
+\newcommand{\SymmetricMatrices}[1]{\SymmetricMatricesSymbol^{#1}}
+\newcommand{\SymmetricPsdMatrices}[1]{\SymmetricMatricesSymbol_{+}^{#1}}
+\newcommand{\SymmetricPdMatrices}[1]{\SymmetricMatricesSymbol_{++}^{#1}}
+\newcommand{\UnitSphere}[1]{\mathcal{S}^{#1}}
+\newcommand{\StandardSimplex}[1]{\Delta_{#1}}
+
+% Prefix operators.
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\ArgminSet}{Argmin}
+\DeclareMathOperator*{\ArgmaxSet}{Argmax}
+\DeclareMathOperator{\Trace}{tr}
+\DeclareMathOperator{\EffectiveDomain}{dom}
+\DeclareMathOperator{\Epigraph}{epi}
+\DeclareMathOperator*{\Interior}{int}
+\newcommand{\Boundary}{\partial}
+\DeclareMathOperator*{\Closure}{cl}
+\DeclareMathOperator*{\Volume}{vol}
+\newcommand{\Gradient}{\nabla}
+\newcommand{\Hessian}{\nabla^2}
+\newcommand{\Subdifferential}{\partial}
+\newcommand{\BigO}{O}
+\newcommand{\BigOTilde}{\widetilde{O}}
+\newcommand{\LittleO}{o}
+\DeclareMathOperator*{\Expectation}{\mathbb{E}}
+\DeclareMathOperator*{\Probability}{\mathbb{P}}
+
+% Postfix operators (superscript-like).
+\newcommand{\Transpose}{^T}
+\newcommand{\MinusTranspose}{^{-T}}
+\newcommand{\Adjoint}{^*}
+\newcommand{\MinusAdjoint}{^{-*}}
+\newcommand{\Dual}{^*}
+\newcommand{\UpperIndex}[1]{^{(#1)}}
+
+% Binary relations.
+\newcommand{\DefinedEqual}{\coloneqq}
+\newcommand{\EqualDefines}{\eqqcolon}
+\newcommand{\DistributedAs}{\sim}
+
+% Paired delimiters.
+\DeclarePairedDelimiterX{\DualPairing}[2]{\langle}{\rangle}{#1, #2}
+\newcommand{\InnerProduct}{\DualPairing}
+\DeclarePairedDelimiter{\Norm}{\lVert}{\rVert}
+\DeclarePairedDelimiterXPP{\DualNorm}[1]{}{\lVert}{\rVert}{_*}{#1}
+\DeclarePairedDelimiterXPP{\RelativeNorm}[2]{}{\lVert}{\rVert}{_{#2}}{#1}
+\DeclarePairedDelimiterXPP{\RelativeDualNorm}[2]{}{\lVert}{\rVert}{_{#2}^*}{#1}
+\DeclarePairedDelimiterXPP{\LpNorm}[2]{}{\lVert}{\rVert}{_{#2}}{#1}
+\DeclarePairedDelimiter{\Abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\Floor}{\lfloor}{\rfloor}
+\DeclarePairedDelimiter{\Ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiterXPP{\PositivePart}[1]{}{\lbrack}{\rbrack}{_+}{#1}
+\DeclarePairedDelimiter{\Cardinality}{\lvert}{\rvert}
+\DeclarePairedDelimiterX{\OpenOpenInterval}[2]{\lparen}{\rparen}{#1, #2}
+\DeclarePairedDelimiterX{\OpenClosedInterval}[2]{\lparen}{\rbrack}{#1, #2}
+\DeclarePairedDelimiterX{\ClosedOpenInterval}[2]{\lbrack}{\rparen}{#1, #2}
+\DeclarePairedDelimiterX{\ClosedClosedInterval}[2]{\lbrack}{\rbrack}{#1, #2}
+\DeclarePairedDelimiter{\Set}{\lbrace}{\rbrace}
+\DeclarePairedDelimiterX{\SetBuilder}[2]{\lbrace}{\rbrace}{#1 : #2}
+
+% Miscellaneous.
+\newcommand{\Map}[3]{#1 \colon #2 \to #3}
+\newcommand{\BregmanDistance}[1]{\beta_{#1}}
+\newcommand{\Projection}[1]{\pi_{#1}}
+\DeclarePairedDelimiterXPP{\Ball}[2]{B}{\lparen}{\rparen}{}{#1, #2}
+\DeclarePairedDelimiterXPP{\NormalDistribution}[2]{\mathcal{N}}{\lparen}{\rparen}{}{#1, #2}
+\DeclarePairedDelimiterXPP{\UniformDistribution}[1]{\operatorname{Unif}}{\lparen}{\rparen}{}{#1}
+
+% Restyle some standard commands.
+\renewcommand{\emptyset}{\varnothing}
+
+% Make sure `\RelativeDualNorm` automatically adds enclosing parentheses when followed by exponentiation operator `^`.
+\DeclarePairedDelimiter{\Parentheses}{\lparen}{\rparen}
+\LetLtxMacro{\RelativeDualNormOriginal}{\RelativeDualNorm}
+\RenewDocumentCommand{\RelativeDualNorm}{s O{} m m e{^}}{%
+  \IfValueTF{#5}{% Exponent.
+    \IfBooleanTF{#1}{% Star.
+      \Parentheses*{\RelativeDualNormOriginal*{#3}{#4}}^{#5}%
+    }{% No star.
+      \Parentheses[#2]{\RelativeDualNormOriginal[#2]{#3}{#4}}^{#5}%
+    }%
+  }{% No exponent.
+    \IfBooleanTF{#1}{% Star.
+      \RelativeDualNormOriginal*{#3}{#4}%
+    }{% No star.
+      \RelativeDualNormOriginal[#2]{#3}{#4}%
+    }%
+  }%
+}
+
+\endinput
